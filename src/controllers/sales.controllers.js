@@ -16,7 +16,7 @@ export const createSales = async (req, res) => {
 
     saleModel.save();
 
-    responseSuccess(res, 200, "venta registrada");
+    responseSuccess(res, 200, "venta registrada", saleModel._id);
   } catch (error) {
     console.log(error);
     return responseError(res, 500, "Error");
@@ -28,6 +28,17 @@ export const getAllSales = async (req, res) => {
 
     const allSales = await SaleSchema.find().populate("idSaller");
     responseSuccess(res, 200, "ventas", allSales);
+    
+  } catch (error) {
+    return responseError(res, 500, "Error");
+  }
+};
+
+export const getSalesById = async (req, res) => {
+  try {
+
+    const saleById = await SaleSchema.findById(req.params.id).populate("idSaller");
+    responseSuccess(res, 200, "venta", saleById);
     
   } catch (error) {
     return responseError(res, 500, "Error");
