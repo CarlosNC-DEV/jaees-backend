@@ -35,6 +35,7 @@ const salesSchema = new Schema(
         numSerial: {
           type: Number,
           required: false,
+          default: null,
         },
       }
     ],

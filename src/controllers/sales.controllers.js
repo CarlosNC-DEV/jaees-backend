@@ -25,10 +25,11 @@ export const createSales = async (req, res) => {
 
 export const getAllSales = async (req, res) => {
   try {
-
-    const allSales = await SaleSchema.find().populate("idSaller");
+    const allSales = await SaleSchema.find().populate({
+      path: "idSaller",
+      select: "-password",
+    });
     responseSuccess(res, 200, "ventas", allSales);
-    
   } catch (error) {
     return responseError(res, 500, "Error");
   }
@@ -36,11 +37,44 @@ export const getAllSales = async (req, res) => {
 
 export const getSalesById = async (req, res) => {
   try {
-
-    const saleById = await SaleSchema.findById(req.params.id).populate("idSaller");
+    const saleById = await SaleSchema.findById(req.params.id).populate({
+      path: "idSaller",
+      select: "-password",
+    });
     responseSuccess(res, 200, "venta", saleById);
-    
   } catch (error) {
     return responseError(res, 500, "Error");
   }
+};
+
+export const getSalesByIdUser = async (req, res) => {
+  try {
+    const salesById = await SaleSchema.find({
+      idSaller: req.params.id,
+    });
+
+    const totalSales = salesById.reduce(
+      (total, venta) => total + sumarValueGames(venta),
+      0
+    );
+
+    const totalSizeGames = salesById.reduce(
+      (total, venta) => total + venta.games.length,
+      0
+    );
+
+    const totalSalesIva = totalSales * 1.19; 
+
+    const data = { totalSales, totalSalesIva, totalSizeGames};
+
+    responseSuccess(res, 200, "ventas usuario", data);
+
+  } catch (error) {
+    console.log(error)
+    return responseError(res, 500, "Error");
+  }
+};
+
+const sumarValueGames = (venta) => {
+  return venta.games.reduce((total, game) => total + game.valueGame, 0);
 };
