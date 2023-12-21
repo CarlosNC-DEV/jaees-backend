@@ -12,8 +12,8 @@ export const dataAuthentication = (req, res, next) => {
 
 // Create new users
 export const dataCreateUsers = (req, res, next) => {
-  const { name, indentification, phone, password } = req.body;
-  if ((!name, !indentification || !phone || !password)) {
+  const { name, indentification, phone, password, createDate } = req.body;
+  if ((!name, !indentification || !phone || !password || !createDate)) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
@@ -30,8 +30,8 @@ export const dataCreateLotteries = (req, res, next) => {
 };
 
 export const dataCreateSales = (req, res, next) => {
-  const { games, idSaller } = req.body;
-  if ((!games, !idSaller)) {
+  const { games, idSaller, createDate } = req.body;
+  if ((!games, !idSaller || !createDate)) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 

@@ -26,9 +26,13 @@ const userSchema = new Schema(
         type: Schema.Types.ObjectId,
       },
     ],
+    createDate:{
+      type:String,
+      required:true
+    }
   },
   {
-    timestamps: true,
+    timestamps: false,
     versionKey: false,
   }
 );

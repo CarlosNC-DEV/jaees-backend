@@ -65,7 +65,9 @@ export const getSalesByIdUser = async (req, res) => {
 
     const totalSalesIva = totalSales * 1.19; 
 
-    const data = { totalSales, totalSalesIva, totalSizeGames};
+    const totalComisonSales = totalSales * 0.02
+
+    const data = { totalComisonSales, totalSalesIva, totalSizeGames};
 
     responseSuccess(res, 200, "ventas usuario", data);
 
@@ -75,6 +77,79 @@ export const getSalesByIdUser = async (req, res) => {
   }
 };
 
+
+export const getSalesByDate = async (req, res) => {
+  try {
+    console.log(req.params.date, req.params.id)
+    const salesById = await SaleSchema.find({
+      createDate:req.params.date,
+      idSaller:req.params.id
+    });
+
+    const totalSales = salesById.reduce(
+      (total, venta) => total + sumarValueGames(venta),
+      0
+    );
+
+    const totalSizeGames = salesById.reduce(
+      (total, venta) => total + venta.games.length,
+      0
+    );
+
+    const totalSalesIva = totalSales * 1.19; 
+
+    const totalComisonSales = totalSales * 0.02
+
+    const data = [{ date:req.params.date, totalComisonSales, totalSalesIva, totalSizeGames}];
+
+    responseSuccess(res, 200, "ventas usuario por fecha", data);
+
+  } catch (error) {
+    console.log(error)
+    return responseError(res, 500, "Error");
+  }
+};
+
+export const getSalesByDateRange = async (req, res) => {
+  try {
+    const { startDate, endDate, id } = req.params;
+
+    const salesByDateRange = await SaleSchema.find({
+      createDate: { $gte: startDate, $lte: endDate },
+      idSaller: id,
+    });
+
+    const result = salesByDateRange.reduce((acc, venta) => {
+      const date = venta.createDate;
+
+      if (!acc[date]) {
+        acc[date] = {
+          totalSales: 0,
+          totalSizeGames: 0,
+        };
+      }
+
+      acc[date].totalSales += sumarValueGames(venta);
+      acc[date].totalSizeGames += venta.games.length;
+
+      return acc;
+    }, {});
+
+    // Convertir el objeto resultante en un array de objetos
+    const data = Object.keys(result).map((date) => ({
+      date,
+      totalComisonSales: result[date].totalSales * 0.02,
+      totalSalesIva: result[date].totalSales * 1.19,
+      totalSizeGames: result[date].totalSizeGames,
+    }));
+    responseSuccess(res, 200, "ventas usuario por fecha", data);
+  } catch (error) {
+    console.log(error)
+    return responseError(res, 500, "Error");
+  }
+};
+
 const sumarValueGames = (venta) => {
   return venta.games.reduce((total, game) => total + game.valueGame, 0);
 };
+

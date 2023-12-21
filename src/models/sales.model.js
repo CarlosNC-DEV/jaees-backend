@@ -39,10 +39,14 @@ const salesSchema = new Schema(
         },
       }
     ],
+    createDate:{
+      type:String,
+      required:true
+    }
   },
   {
     versionKey: false,
-    timestamps: true,
+    timestamps: false,
   }
 );
 
