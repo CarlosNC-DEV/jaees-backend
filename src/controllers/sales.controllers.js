@@ -1,4 +1,6 @@
+import moment from 'moment';
 import SaleSchema from "../models/sales.model.js";
+import LotteriesSchema from "../models/lotteries.model.js";
 import {
   responseError,
   responseSuccess,
@@ -11,10 +13,48 @@ import {
 export const createSales = async (req, res) => {
   try {
     const saleModel = new SaleSchema(req.body);
+
+    const lotteriesFound = await LotteriesSchema.find({ name: { $in: saleModel.games.map(game => game.loteria) } });
+
+    for (const lottery of lotteriesFound) {
+      // Accede al array de días
+      const days = lottery.dayGames;
+    
+    // Obtén el día actual
+    const today = new Date().getDay();
+          
+    // Encuentra el índice del día más cercano en el array
+    let closestDayIndex = days.findIndex(day => {
+      const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
+      return dayIndex >= 0 && (dayIndex > today || (dayIndex === today && new Date().getHours() < 23)); // Hora límite a las 11:59 PM
+    });
+
+    // Si el día inicial es null o está en el pasado, vuelve a recorrer todo el array desde el principio
+    if (closestDayIndex < 0 || ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(days[closestDayIndex].toLowerCase()) < today) {
+      closestDayIndex = days.findIndex(day => {
+        const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
+        return dayIndex >= 0; // Puedes ajustar esta condición según tus necesidades
+      });
+    }
+
+    // Obtiene el día más cercano
+    const closestDay = closestDayIndex >= 0 ? days[closestDayIndex] : null;
+
+    const fecha = obtenerFechaSiguiente(closestDay);
+
+    // Actualiza las fechas en cada juego dentro de la venta
+    saleModel.games.forEach(game => {
+      if (game.loteria === lottery.name) {
+        game.dateDayGame = fecha;
+      }
+    });
+
+    }
+
     saleModel.codeSecure = await generateUniqueRandomCode(9);
     saleModel.code = await generateCode();
 
-    saleModel.save();
+    await saleModel.save();
 
     responseSuccess(res, 200, "venta registrada", saleModel._id);
   } catch (error) {
@@ -22,6 +62,33 @@ export const createSales = async (req, res) => {
     return responseError(res, 500, "Error");
   }
 };
+
+function obtenerFechaSiguiente(diaSemana) {
+  // Obtener la fecha actual
+  const fechaActual = moment();
+
+  const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(diaSemana.toLowerCase())
+
+  // Verificar si el día proporcionado es el mismo que el día actual
+  if (dayIndex === fechaActual.day()) {
+    return fechaActual.format('YYYY-MM-DD');
+  }
+
+  // Calcular la diferencia de días hasta el próximo día de la semana deseado
+  let diasHastaSiguiente = (dayIndex - fechaActual.day() + 7) % 7;
+  console.log(diasHastaSiguiente.toString())
+
+  // Si el resultado es 0, significa que ya estamos en ese día, así que avanzamos una semana
+  if (diasHastaSiguiente === 0) {
+    diasHastaSiguiente = 7;
+  }
+
+  // Calcular la fecha del próximo día de la semana
+  const fechaSiguiente = fechaActual.add(diasHastaSiguiente, 'days');
+
+  return fechaSiguiente.format('YYYY-MM-DD');
+}
+
 
 export const getAllSales = async (req, res) => {
   try {

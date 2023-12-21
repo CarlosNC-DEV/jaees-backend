@@ -37,6 +37,11 @@ const salesSchema = new Schema(
           required: false,
           default: null,
         },
+        dateDayGame:{
+          type:String,
+          required:false,
+          default:null
+        }
       }
     ],
     createDate:{
