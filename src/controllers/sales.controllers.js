@@ -144,6 +144,20 @@ export const getSalesByIdUser = async (req, res) => {
   }
 };
 
+export const getSalesByIdUserSales = async (req, res) => {
+  try {
+    const salesByIdUser = await SaleSchema.find({
+      idSaller: req.params.idUser,
+    }).sort({createDate:-1});
+
+    responseSuccess(res, 200, "ventas usuario", salesByIdUser);
+
+  } catch (error) {
+    console.log(error)
+    return responseError(res, 500, "Error");
+  }
+};
+
 
 export const getSalesByDate = async (req, res) => {
   try {
