@@ -21,8 +21,17 @@ export const dataCreateUsers = (req, res, next) => {
 };
 
 export const dataCreateLotteries = (req, res, next) => {
-  const { name, dayGames } = req.body;
-  if ((!name, !dayGames)) {
+  const { name, dayGames, amountMax } = req.body;
+  if ((!name || !dayGames || !amountMax)) {
+    return responseError(res, 200, "Todos los datos son requeridos");
+  }
+
+  next();
+};
+
+export const dataUpdateLotteries = (req, res, next) => {
+  const { amountMax } = req.body;
+  if ((!amountMax)) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
@@ -31,7 +40,7 @@ export const dataCreateLotteries = (req, res, next) => {
 
 export const dataCreateSales = (req, res, next) => {
   const { games, idSaller, createDate } = req.body;
-  if ((!games, !idSaller || !createDate)) {
+  if ((!games || !idSaller || !createDate)) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 

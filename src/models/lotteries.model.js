@@ -4,6 +4,7 @@ const lotteriesSchema = new Schema(
   {
     name: { type: String, required: true },
     dayGames: [ String ],
+    amountMax: { type:Number, required:true}
   },
   {
     versionKey: false,
