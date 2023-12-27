@@ -52,7 +52,7 @@ export const updateAmountMax = async(req, res)=>{
   try {
 
     const lotteriesUpdate = await LotteriesModel.findByIdAndUpdate(req.params.id, 
-    { amountMax: req.body.amountMax, state:req.body.state});
+    { amountMax: req.body.amountMax, state:req.body.state, name:req.body.name});
     
     if(!lotteriesUpdate){
       return responseError(res, 200, "No fue posible actualizar la loteria");

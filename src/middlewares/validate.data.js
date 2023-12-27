@@ -30,8 +30,8 @@ export const dataCreateLotteries = (req, res, next) => {
 };
 
 export const dataUpdateLotteries = (req, res, next) => {
-  const { amountMax } = req.body;
-  if ((!amountMax)) {
+  const { name, amountMax } = req.body;
+  if ((!name || !amountMax)) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
