@@ -36,10 +36,24 @@ export const getAllLottieres = async (req, res) => {
   }
 };
 
+export const getAllLottieresHabilitadas = async (req, res) => {
+  try {
+
+    const allLottieres = await LotteriesModel.find({state:true});
+
+    return responseSuccess(res, 200, "loterias", allLottieres);
+
+  } catch (error) {
+    return responseError(res, 500, "error");
+  }
+};
+
 export const updateAmountMax = async(req, res)=>{
   try {
 
-    const lotteriesUpdate = await LotteriesModel.findByIdAndUpdate(req.params.id, { amountMax: req.body.amountMax})
+    const lotteriesUpdate = await LotteriesModel.findByIdAndUpdate(req.params.id, 
+    { amountMax: req.body.amountMax, state:req.body.state});
+    
     if(!lotteriesUpdate){
       return responseError(res, 200, "No fue posible actualizar la loteria");
     }

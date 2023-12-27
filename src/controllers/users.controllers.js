@@ -44,6 +44,10 @@ export const authenticationUsers = async(req, res)=>{
             return responseError(res, 200, "Contraseña incorrecta")
         }
 
+        if(!usuarioFound.state){
+            return responseError(res, 200, "Usuario inhabilitado")
+        }
+
         const usuarioWithoutPassword = { ...usuarioFound._doc };
         delete usuarioWithoutPassword.password;
         delete usuarioWithoutPassword.password;
@@ -65,3 +69,30 @@ export const getUserById = async(req, res)=>{
         return responseError(res, 500, "error")
     }
 }
+
+export const getAllUser = async(req, res)=>{
+    try {
+        const usersFound = await usersModel.find().populate("rol").select("-password")
+        return responseSuccess(res, 200, "Todos los usuarios", usersFound)
+        
+    } catch (error) {
+        return responseError(res, 500, "error")
+    }
+}
+
+export const updateStateUser = async(req, res)=>{
+    try {
+  
+      const userUpdate = await UserModel.findByIdAndUpdate(req.params.id, { state:req.body.state });
+      
+      if(!userUpdate){
+        return responseError(res, 200, "No fue posible actualizar el usuario");
+      }
+
+      
+      return responseSuccess(res, 200, "usuario actualizado");
+  
+    } catch (error) {
+      return responseError(res, 500, "error");
+    }
+  }

@@ -29,7 +29,8 @@ const userSchema = new Schema(
     createDate:{
       type:String,
       required:true
-    }
+    },
+    state:{ type:Boolean, required:false, default:true }
   },
   {
     timestamps: false,
