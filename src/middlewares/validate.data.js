@@ -13,7 +13,7 @@ export const dataAuthentication = (req, res, next) => {
 // Create new users
 export const dataCreateUsers = (req, res, next) => {
   const { name, indentification, phone, password, createDate } = req.body;
-  if ((!name, !indentification || !phone || !password || !createDate)) {
+  if (!name, !indentification || !phone || !password || !createDate) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
@@ -22,7 +22,7 @@ export const dataCreateUsers = (req, res, next) => {
 
 export const dataCreateLotteries = (req, res, next) => {
   const { name, dayGames, amountMax } = req.body;
-  if ((!name || !dayGames || !amountMax)) {
+  if (!name || !dayGames || !amountMax) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
@@ -31,7 +31,7 @@ export const dataCreateLotteries = (req, res, next) => {
 
 export const dataUpdateLotteries = (req, res, next) => {
   const { name, amountMax } = req.body;
-  if ((!name || !amountMax)) {
+  if (!name || !amountMax) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
@@ -40,7 +40,16 @@ export const dataUpdateLotteries = (req, res, next) => {
 
 export const dataCreateSales = (req, res, next) => {
   const { games, idSaller, createDate } = req.body;
-  if ((!games || !idSaller || !createDate)) {
+  if (!games || !idSaller || !createDate) {
+    return responseError(res, 200, "Todos los datos son requeridos");
+  }
+
+  next();
+};
+
+export const dataCreateAndUpdateCompany = (req, res, next) => {
+  const { nit, register, name, phone, email, address } = req.body;
+  if (!nit || !register || !name || !phone || !email || !address) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
