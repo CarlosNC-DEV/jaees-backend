@@ -25,15 +25,15 @@ const salesSchema = new Schema(
           required: true,
         },
         numGame: {
-          type: Number,
+          type: String,
           required: true,
         },
         valueGame: {
-          type: Number,
+          type: String,
           required: true,
         },
         numSerial: {
-          type: Number,
+          type: String,
           required: false,
           default: null,
         },

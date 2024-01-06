@@ -12,11 +12,14 @@ import {
 
 export const createSales = async (req, res) => {
   try {
+
     const saleModel = new SaleSchema(req.body);
 
     const lotteriesFound = await LotteriesSchema.find({ name: { $in: saleModel.games.map(game => game.loteria) } });
 
     for (const lottery of lotteriesFound) {
+      var resulFecha = null
+      var isComplete = false
       // Accede al array de días
       const days = lottery.dayGames;
     
@@ -26,26 +29,44 @@ export const createSales = async (req, res) => {
     // Encuentra el índice del día más cercano en el array
     let closestDayIndex = days.findIndex(day => {
       const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
-      return dayIndex >= 0 && (dayIndex > today || (dayIndex === today && new Date().getHours() < 23)); // Hora límite a las 11:59 PM
+      if(dayIndex === today){
+        if(new Date().getHours() >= 0){
+          if(days.length == 1){
+            const newDate = obtenerFechaSiguienteHoy()
+            resulFecha = newDate
+            isComplete=true
+            return true
+          }else{
+            return false
+          }
+        }else{
+          return true
+        }
+      }
+
+      return dayIndex >= 0 
     });
 
     // Si el día inicial es null o está en el pasado, vuelve a recorrer todo el array desde el principio
-    if (closestDayIndex < 0 || ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(days[closestDayIndex].toLowerCase()) < today) {
+    if (closestDayIndex < 0 || closestDayIndex >= days.length || ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes','sábado'].indexOf(days[closestDayIndex].toLowerCase()) < today) {
       closestDayIndex = days.findIndex(day => {
-        const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
-        return dayIndex >= 0; // Puedes ajustar esta condición según tus necesidades
+          const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
+          return dayIndex >= 0;
       });
     }
 
-    // Obtiene el día más cercano
-    const closestDay = closestDayIndex >= 0 ? days[closestDayIndex] : null;
 
-    const fecha = obtenerFechaSiguiente(closestDay);
+    // Obtiene el día más cercano
+    if(!isComplete){
+      const closestDay = closestDayIndex >= 0 ? days[closestDayIndex] : null;
+      resulFecha = obtenerFechaSiguiente(closestDay);
+    }
+
 
     // Actualiza las fechas en cada juego dentro de la venta
     saleModel.games.forEach(game => {
       if (game.loteria === lottery.name) {
-        game.dateDayGame = fecha;
+        game.dateDayGame = resulFecha;
       }
     });
 
@@ -56,7 +77,7 @@ export const createSales = async (req, res) => {
 
     await saleModel.save();
 
-    responseSuccess(res, 200, "venta registrada", saleModel._id);
+    return responseSuccess(res, 200, "venta registrada", saleModel._id);
   } catch (error) {
     console.log(error);
     return responseError(res, 500, "Error");
@@ -76,7 +97,6 @@ function obtenerFechaSiguiente(diaSemana) {
 
   // Calcular la diferencia de días hasta el próximo día de la semana deseado
   let diasHastaSiguiente = (dayIndex - fechaActual.day() + 7) % 7;
-  console.log(diasHastaSiguiente.toString())
 
   // Si el resultado es 0, significa que ya estamos en ese día, así que avanzamos una semana
   if (diasHastaSiguiente === 0) {
@@ -89,6 +109,14 @@ function obtenerFechaSiguiente(diaSemana) {
   return fechaSiguiente.format('YYYY-MM-DD');
 }
 
+function obtenerFechaSiguienteHoy() {
+  // Obtener la fecha actual
+  const fechaActual = moment();
+  const fechaResult = fechaActual.clone().add(7, 'days');
+  return fechaResult.format('YYYY-MM-DD');
+  
+}
+
 
 export const getAllSales = async (req, res) => {
   try {
@@ -96,7 +124,14 @@ export const getAllSales = async (req, res) => {
       path: "idSaller",
       select: "-password",
     });
-    responseSuccess(res, 200, "ventas", allSales);
+
+    const totalSales = allSales.reduce((total, venta) => total + sumarValueGames(venta),0);
+
+    const totalIva = totalSales * 1.19
+
+    const data = { total:totalSales, totalIva, sales:allSales}
+
+    responseSuccess(res, 200, "ventas", data);
   } catch (error) {
     return responseError(res, 500, "Error");
   }
@@ -120,15 +155,9 @@ export const getSalesByIdUser = async (req, res) => {
       idSaller: req.params.id,
     });
 
-    const totalSales = salesById.reduce(
-      (total, venta) => total + sumarValueGames(venta),
-      0
-    );
+    const totalSales = salesById.reduce((total, venta) => total + sumarValueGames(venta),0);
 
-    const totalSizeGames = salesById.reduce(
-      (total, venta) => total + venta.games.length,
-      0
-    );
+    const totalSizeGames = salesById.reduce((total, venta) => total + venta.games.length,0);
 
     const totalSalesIva = totalSales * 1.19; 
 
@@ -231,6 +260,6 @@ export const getSalesByDateRange = async (req, res) => {
 };
 
 const sumarValueGames = (venta) => {
-  return venta.games.reduce((total, game) => total + game.valueGame, 0);
+  return venta.games.reduce((total, game) => parseFloat(total) + parseFloat(game.valueGame), 0);
 };
 
