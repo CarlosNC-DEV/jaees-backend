@@ -122,10 +122,9 @@ export const getAllSales = async (req, res) => {
 
     const totalSize = allSales.length;
     const totalSales = allSales.reduce((total, venta) => total + sumarValueGames(venta),0);
-    const totalIva = totalSales * 1.19
-
-
-    const data = { totalSize, total:totalSales, totalIva, sales:allSales}
+    const subTotal = totalSales / 1.19
+  
+    const data = { totalSize, total:subTotal, totalIva:totalSales, sales:allSales}
 
     responseSuccess(res, 200, "ventas", data);
 
@@ -157,7 +156,7 @@ export const getSalesByIdUser = async (req, res) => {
 
     const totalSizeGames = salesById.reduce((total, venta) => total + venta.games.length,0);
 
-    const totalSalesIva = totalSales * 1.19; 
+    const totalSalesIva = totalSales; 
 
     const totalComisonSales = totalSales * 0.02
 
@@ -204,7 +203,7 @@ export const getSalesByDate = async (req, res) => {
       0
     );
 
-    const totalSalesIva = totalSales * 1.19; 
+    const totalSalesIva = totalSales; 
 
     const totalComisonSales = totalSales * 0.02
 
@@ -247,7 +246,7 @@ export const getSalesByDateRange = async (req, res) => {
     const data = Object.keys(result).map((date) => ({
       date,
       totalComisonSales: result[date].totalSales * 0.02,
-      totalSalesIva: result[date].totalSales * 1.19,
+      totalSalesIva: result[date].totalSales,
       totalSizeGames: result[date].totalSizeGames,
     }));
     responseSuccess(res, 200, "ventas usuario por fecha", data);
