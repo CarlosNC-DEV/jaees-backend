@@ -1,10 +1,25 @@
 import SaleSchema from "../models/sales.model.js";
 
 export async function generateCode() {
-  const count = await SaleSchema.countDocuments(); // Usar SaleSchema.countDocuments() en lugar de doc.constructor.countDocuments()
-  const codeGenerate = count + 1;
-  return codeGenerate;
+  try {
+    const count = await SaleSchema.countDocuments();
+    const codeGenerate = count + 1;
+    const uniqueCode = await findUniqueCode(codeGenerate);
+    return uniqueCode;
+  } catch (error) {
+    throw error;
+  }
 }
+
+// Función recursiva para encontrar un código único
+const findUniqueCode = async (code) => {
+  const codeFound = await SaleSchema.findOne({ code });
+  if (codeFound) {
+    return findUniqueCode(code + 1);
+  } else {
+    return code;
+  }
+};
 
 export async function generateUniqueRandomCode(length) {
   while (true) {
