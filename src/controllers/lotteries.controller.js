@@ -62,7 +62,7 @@ export const updateAmountMax = async(req, res)=>{
       return responseError(res, 200, "No fue posible actualizar la loteria");
     }
 
-    
+  
     return responseSuccess(res, 200, "loteria actualizada");
 
   } catch (error) {
