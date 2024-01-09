@@ -19,6 +19,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
+      default:false
     },
     rol: [
       {
@@ -30,7 +31,15 @@ const userSchema = new Schema(
       type:String,
       required:true
     },
-    state:{ type:Boolean, required:false, default:true }
+    online:{
+      type:Boolean, 
+      required:true,
+      default:false
+    },
+    state:{ 
+      type:Boolean, 
+      required:false, 
+      default:true }
   },
   {
     timestamps: false,

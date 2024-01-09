@@ -50,9 +50,13 @@ export const getAllLottieresHabilitadas = async (req, res) => {
 
 export const updateAmountMax = async(req, res)=>{
   try {
-
     const lotteriesUpdate = await LotteriesModel.findByIdAndUpdate(req.params.id, 
-    { amountMax: req.body.amountMax, state:req.body.state, name:req.body.name, dayGames:req.body.dayGames });
+    { amountMax: req.body.amountMax, 
+      state:req.body.state, 
+      name:req.body.name, 
+      dayGames:req.body.dayGames,
+      hoursGame:req.body.hoursGame
+    });
     
     if(!lotteriesUpdate){
       return responseError(res, 200, "No fue posible actualizar la loteria");
@@ -65,3 +69,9 @@ export const updateAmountMax = async(req, res)=>{
     return responseError(res, 500, "error");
   }
 }
+
+
+
+
+
+

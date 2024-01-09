@@ -12,77 +12,72 @@ import {
 
 export const createSales = async (req, res) => {
   try {
-
     const saleModel = new SaleSchema(req.body);
-
     const lotteriesFound = await LotteriesSchema.find({ name: { $in: saleModel.games.map(game => game.loteria) } });
 
+    let responseSent = false;
+
     for (const lottery of lotteriesFound) {
-      var resulFecha = null
-      var isComplete = false
-      // Accede al array de días
       const days = lottery.dayGames;
-    
-    // Obtén el día actual
-    const today = new Date().getDay();
-          
-    // Encuentra el índice del día más cercano en el array
-    let closestDayIndex = days.findIndex(day => {
+      const hoursGame = lottery.hoursGame;
+
+      const today = new Date().getDay();
+
+      let closestDayIndex = days.findIndex(day => {
       const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
-      if(dayIndex === today){
-        if(new Date().getHours() >= 0){
-          if(days.length == 1){
-            const newDate = obtenerFechaSiguienteHoy()
-            resulFecha = newDate
-            isComplete=true
-            return true
-          }else{
-            return false
+
+        if (dayIndex === today) {
+          if (new Date().getHours() >= parseFloat(hoursGame)) {
+            if (days.length === 1) {
+              responseSent = true;
+              responseError(res, 200, `Loteria ${lottery.name} cerrada`);
+            } else {
+              return false;
+            }
+          } else {
+            return true;
           }
-        }else{
-          return true
         }
+
+        return dayIndex >= 0;
+      });
+
+      if (responseSent) {
+        break; 
       }
 
-      return dayIndex >= 0 
-    });
-
-    // Si el día inicial es null o está en el pasado, vuelve a recorrer todo el array desde el principio
-    if (closestDayIndex < 0 || closestDayIndex >= days.length || ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes','sábado'].indexOf(days[closestDayIndex].toLowerCase()) < today) {
-      closestDayIndex = days.findIndex(day => {
+      if (closestDayIndex < 0 || closestDayIndex >= days.length || ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes','sábado'].indexOf(days[closestDayIndex].toLowerCase()) < today) {
+        closestDayIndex = days.findIndex(day => {
           const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
           return dayIndex >= 0;
+        });
+      }
+
+      const closestDay = closestDayIndex >= 0 ? days[closestDayIndex] : null;
+      const resulFecha = obtenerFechaSiguiente(closestDay);
+
+      saleModel.games.forEach(game => {
+        if (game.loteria === lottery.name) {
+          game.dateDayGame = resulFecha;
+        }
       });
     }
 
+    if (!responseSent) {
+      saleModel.codeSecure = await generateUniqueRandomCode(9);
+      saleModel.code = await generateCode();
 
-    // Obtiene el día más cercano
-    if(!isComplete){
-      const closestDay = closestDayIndex >= 0 ? days[closestDayIndex] : null;
-      resulFecha = obtenerFechaSiguiente(closestDay);
+      await saleModel.save();
+
+      responseSuccess(res, 200, "venta registrada", saleModel._id);
     }
-
-
-    // Actualiza las fechas en cada juego dentro de la venta
-    saleModel.games.forEach(game => {
-      if (game.loteria === lottery.name) {
-        game.dateDayGame = resulFecha;
-      }
-    });
-
-    }
-
-    saleModel.codeSecure = await generateUniqueRandomCode(9);
-    saleModel.code = await generateCode();
-
-    await saleModel.save();
-
-    return responseSuccess(res, 200, "venta registrada", saleModel._id);
   } catch (error) {
     console.log(error);
-    return responseError(res, 500, "Error");
+    responseError(res, 500, "Error");
   }
 };
+
+
 
 function obtenerFechaSiguiente(diaSemana) {
   // Obtener la fecha actual
@@ -125,14 +120,17 @@ export const getAllSales = async (req, res) => {
       select: "-password",
     });
 
+    const totalSize = allSales.length;
     const totalSales = allSales.reduce((total, venta) => total + sumarValueGames(venta),0);
-
     const totalIva = totalSales * 1.19
 
-    const data = { total:totalSales, totalIva, sales:allSales}
+
+    const data = { totalSize, total:totalSales, totalIva, sales:allSales}
 
     responseSuccess(res, 200, "ventas", data);
+
   } catch (error) {
+    console.log(error)
     return responseError(res, 500, "Error");
   }
 };

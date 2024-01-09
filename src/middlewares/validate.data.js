@@ -21,8 +21,8 @@ export const dataCreateUsers = (req, res, next) => {
 };
 
 export const dataCreateLotteries = (req, res, next) => {
-  const { name, dayGames, amountMax } = req.body;
-  if (!name || !dayGames || !amountMax) {
+  const { name, dayGames, hoursGame, amountMax } = req.body;
+  if (!name || !dayGames || !hoursGame || !amountMax) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
@@ -30,8 +30,8 @@ export const dataCreateLotteries = (req, res, next) => {
 };
 
 export const dataUpdateLotteries = (req, res, next) => {
-  const { name, amountMax, dayGames } = req.body;
-  if (!name || !amountMax || !dayGames) {
+  const { name, dayGames, hoursGame, amountMax } = req.body;
+  if (!name || !dayGames || !hoursGame || !amountMax) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 
