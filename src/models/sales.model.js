@@ -5,7 +5,7 @@ const salesSchema = new Schema(
     code: {
       type: Number,
       required: true,
-      unique: false,
+      unique: true,
     },
     codeSecure: {
       type: Number,
