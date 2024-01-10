@@ -25,7 +25,6 @@ export const createSales = async (req, res) => {
 
       let closestDayIndex = days.findIndex(day => {
       const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
-
         if (dayIndex === today) {
           if (new Date().getHours() >= parseFloat(hoursGame)) {
             if (days.length === 1) {
@@ -39,7 +38,7 @@ export const createSales = async (req, res) => {
           }
         }
 
-        return dayIndex >= 0;
+        return dayIndex >= 0 && dayIndex > today
       });
 
       if (responseSent) {
