@@ -27,16 +27,23 @@ export const createSales = async (req, res) => {
       const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
         if (dayIndex === today) {
           if (new Date().getHours() >= parseFloat(hoursGame)) {
-            if (days.length === 1) {
               responseSent = true;
               responseError(res, 200, `Loteria ${lottery.name} cerrada`);
-            } else {
-              return false;
-            }
           } else {
             return true;
           }
         }
+
+        /*
+
+        if (days.length === 1) {
+          responseSent = true;
+          responseError(res, 200, `Loteria ${lottery.name} cerrada`);
+        } else {
+          return false;
+        }
+
+        */
 
         return dayIndex >= 0 && dayIndex > today
       });
