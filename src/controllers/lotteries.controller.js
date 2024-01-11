@@ -43,7 +43,7 @@ export const getAllLottieresHabilitadas = async (req, res) => {
     const options = { weekday: 'long' };
     const now = new Date(new Date().toLocaleString('en-US', { timeZone }));
     const formattedDate = now.toLocaleDateString('es-US', options).toLowerCase();
-    const hours = new Date().getHours()
+    const hours = now.getHours();
 
     const allLottieres = await LotteriesModel.find({state:true});
 
