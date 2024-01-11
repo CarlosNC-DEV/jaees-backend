@@ -39,11 +39,16 @@ export const getAllLottieres = async (req, res) => {
 export const getAllLottieresHabilitadas = async (req, res) => {
   try {
 
+    const today = new Date().toLocaleDateString('es-US', { weekday: 'long' }).toLowerCase();
+
     const allLottieres = await LotteriesModel.find({state:true});
 
-    return responseSuccess(res, 200, "loterias", allLottieres);
+    const lotteriesToday = allLottieres.filter(lottery => lottery.dayGames.includes(today));
+
+    return responseSuccess(res, 200, "loterias", lotteriesToday);
 
   } catch (error) {
+    console.log(error)
     return responseError(res, 500, "error");
   }
 };
