@@ -39,7 +39,7 @@ export const getAllLottieres = async (req, res) => {
 export const getAllLottieresHabilitadas = async (req, res) => {
   try {
 
-    const timeZone = 'America/Santiago';
+    const timeZone = 'America/Bogota';
     const options = { weekday: 'long' };
     const now = new Date(new Date().toLocaleString('en-US', { timeZone }));
     const formattedDate = now.toLocaleDateString('es-US', options).toLowerCase();
