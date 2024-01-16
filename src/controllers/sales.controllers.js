@@ -21,12 +21,15 @@ export const createSales = async (req, res) => {
       const days = lottery.dayGames;
       const hoursGame = lottery.hoursGame;
 
-      const today = new Date().getDay();
+      const timeZone = 'America/Santiago';
+      const now = new Date(new Date().toLocaleString('en-US', { timeZone }));
+      const hours = now.getHours();
+      const today = now.getDay()
 
       let closestDayIndex = days.findIndex(day => {
       const dayIndex = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'].indexOf(day.toLowerCase());
         if (dayIndex === today) {
-          if (new Date().getHours() >= parseFloat(hoursGame)) {
+          if (hours >= parseFloat(hoursGame)) {
               responseSent = true;
               responseError(res, 200, `Loteria ${lottery.name} cerrada`);
           } else {
