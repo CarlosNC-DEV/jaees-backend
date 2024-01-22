@@ -55,3 +55,25 @@ export const dataCreateAndUpdateCompany = (req, res, next) => {
 
   next();
 };
+
+export const dataCreateWinners = (req, res, next) => {
+
+  const { numGame, lottery, dateGame } = req.body;
+
+  if (!numGame || !lottery || !dateGame) {
+    return responseError(res, 200, "Todos los datos son requeridos");
+  }
+
+  next();
+};
+
+export const dateGetWinners = (req, res, next) => {
+
+  const { lottery, dateGame } = req.body;
+
+  if (!lottery || !dateGame) {
+    return responseError(res, 200, "Todos los datos son requeridos");
+  }
+
+  next();
+};
