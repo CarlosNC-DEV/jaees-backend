@@ -44,10 +44,21 @@ export const getAllLottieresHabilitadas = async (req, res) => {
     const now = new Date(new Date().toLocaleString('en-US', { timeZone }));
     const formattedDate = now.toLocaleDateString('es-US', options).toLowerCase();
     const hours = now.getHours();
+    const minutes = now.getMinutes();
+
 
     const allLottieres = await LotteriesModel.find({state:true});
 
-    const lotteriesToday = allLottieres.filter(lottery => lottery.dayGames.includes(formattedDate) && lottery.hoursGame > hours);
+    const lotteriesToday = allLottieres.filter(lottery => {
+      const timeHoursSplit = lottery.hoursGame.split(":")
+      const hourLotteries = parseInt(timeHoursSplit[0])
+      const minuteLotteries = parseInt(timeHoursSplit[1])
+
+      return lottery.dayGames.includes(formattedDate) && (
+          hourLotteries > hours || // La hora de la lotería es después de la hora actual
+          (hourLotteries === hours && minuteLotteries > minutes) // La hora de la lotería es la misma pero el minuto es posterior o igual al minuto actual
+      )
+    });
 
     return responseSuccess(res, 200, "loterias", lotteriesToday);
 
