@@ -39,8 +39,8 @@ export const dataUpdateLotteries = (req, res, next) => {
 };
 
 export const dataCreateSales = (req, res, next) => {
-  const { games, idSaller, createDate } = req.body;
-  if (!games || !idSaller || !createDate) {
+  const { games, idSaller, createDate, createTime } = req.body;
+  if (!games || !idSaller || !createDate, !createTime) {
     return responseError(res, 200, "Todos los datos son requeridos");
   }
 

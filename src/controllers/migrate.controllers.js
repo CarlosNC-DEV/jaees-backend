@@ -1,6 +1,7 @@
 import LotteriesModel from "../models/lotteries.model.js";
 import SalesModel from "../models/sales.model.js";
 import UserModel from "../models/users.model.js";
+
 import {
   responseError,
   responseSuccess,
@@ -10,10 +11,23 @@ export const updateNewHorsh = async (req, res) => {
   try {
     const update = await LotteriesModel.updateMany(
       { hoursGame: { $exists: false } },
-      { $set: { hoursGame: "22" } }
+      { $set: { hoursGame: "22:30:30" } }
     );
 
     responseSuccess(res, 200, "loterias actualizadas");
+  } catch (error) {
+    return responseError(res, 500, "Error");
+  }
+};
+
+export const updateNewTime = async (req, res) => {
+  try {
+    const update = await SalesModel.updateMany(
+        { createTime: { $exists: false } },
+        { $set: { createTime: "13:30:30" } }
+    );
+
+    responseSuccess(res, 200, "ventas actualizadas");
   } catch (error) {
     return responseError(res, 500, "Error");
   }
