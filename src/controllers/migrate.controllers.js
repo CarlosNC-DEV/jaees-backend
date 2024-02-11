@@ -24,7 +24,7 @@ export const updateNewTime = async (req, res) => {
   try {
     const update = await SalesModel.updateMany(
         { createTime: { $exists: false } },
-        { $set: { createTime: "13:30:30" } }
+        { $set: { createTime: "11:11:11" } }
     );
 
     responseSuccess(res, 200, "ventas actualizadas");
