@@ -118,8 +118,9 @@ export const updateLineUser = async (req, res) => {
         });
 
         if (!userUpdate.state) {
-            await UserModel.findByIdAndUpdate(req.params.id, {online: false});
-            return responseError(res, 200, "disabled");
+            return responseError(res, 500, "error");
+            /*await UserModel.findByIdAndUpdate(req.params.id, {online: false});
+            return responseError(res, 200, "disabled");*/
         }
 
         if (!userUpdate) {
