@@ -99,6 +99,7 @@ export const updateStateUser = async (req, res) => {
     try {
         const userUpdate = await UserModel.findByIdAndUpdate(req.params.id, {
             state: req.body.state,
+            country: req.body.country
         });
 
         if (!userUpdate) {

@@ -39,7 +39,13 @@ const userSchema = new Schema(
     state:{ 
       type:Boolean, 
       required:false, 
-      default:true }
+      default:true 
+    },
+    country:{ 
+      type:String, 
+      required:true, 
+      default:'colombia' 
+    }
   },
   {
     timestamps: false,
