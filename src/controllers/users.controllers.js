@@ -128,7 +128,7 @@ export const updateLineUser = async (req, res) => {
             return responseError(res, 200, "Estado no actualizado");
         }
 
-        return responseSuccess(res, 200, "usuario actualizado");
+        return responseSuccess(res, 200, "usuario actualizado", userUpdate);
     } catch (error) {
         return responseError(res, 500, "error");
     }

@@ -77,15 +77,56 @@ export const getAllSales = async (req, res) => {
   }
 };
 
+// Función auxiliar para redondear según la moneda
+function roundCurrency(value, currency) {
+  switch (currency) {
+    case 'colombia':
+      return `${Math.round(value)} COP`;
+    case 'ecuador':
+      return `${Number(value.toFixed(2))} USD`;
+    case 'chile':
+      return `${Math.round(value)} CLP`;
+    default:
+      return Number(value.toFixed(2));
+  }
+}
+
 export const getSalesById = async (req, res) => {
   try {
     const saleById = await SaleSchema.findById(req.params.id).populate({
       path: "idSaller",
       select: "-password",
     });
-    responseSuccess(res, 200, "venta", saleById);
+
+    if (!saleById) {
+      return responseError(res, 404, "Venta no encontrada");
+    }
+
+    let currency = 'colombia';
+    if (saleById.idSaller.country) {
+      currency = saleById.idSaller.country;
+    }
+
+    const totalGames = saleById.games.reduce((sum, game) => {
+      const gameValue = Number(game.valueGame);
+      return sum + (isNaN(gameValue) ? 0 : gameValue);
+    }, 0);
+
+    const subTotal = totalGames / 1.19;
+    const ivaTotal = totalGames - subTotal;
+    const totalPago = totalGames;
+
+    const saleWithTotals = {
+      ...saleById.toObject(),
+      subTotal: roundCurrency(subTotal, currency),
+      ivaTotal: roundCurrency(ivaTotal, currency),
+      totalPago: roundCurrency(totalPago, currency)
+    };
+
+    responseSuccess(res, 200, "venta", saleWithTotals);
   } catch (error) {
-    return responseError(res, 500, "Error");
+    console.log(error);
+    return responseError(res, 500, "Error al obtener la venta: " + error.message);
   }
 };
 
