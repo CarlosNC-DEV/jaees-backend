@@ -77,7 +77,7 @@ export const getUserById = async (req, res) => {
             .findById(req.params.id)
             .populate("rol")
             .select("-password");
-        return responseSuccess(res, 200, "Usuario encontrado", userFound);
+        return res.status(200).json(userFound)
     } catch (error) {
         return responseError(res, 500, "error");
     }
@@ -99,7 +99,8 @@ export const updateStateUser = async (req, res) => {
     try {
         const userUpdate = await UserModel.findByIdAndUpdate(req.params.id, {
             state: req.body.state,
-            country: req.body.country
+            country: req.body.country,
+            permissions: req.body.permissions
         });
 
         if (!userUpdate) {

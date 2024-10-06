@@ -45,7 +45,8 @@ const userSchema = new Schema(
       type:String, 
       required:true, 
       default:'colombia' 
-    }
+    },
+    permissions: [String]
   },
   {
     timestamps: false,
