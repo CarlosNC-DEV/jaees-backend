@@ -269,6 +269,7 @@ export const getSalesByDateRange = async (req, res) => {
   }
 };
 
+
 const sumarValueGames = (venta) => {
   return venta.games.reduce((total, game) => parseFloat(total) + parseFloat(game.valueGame), 0);
 };
