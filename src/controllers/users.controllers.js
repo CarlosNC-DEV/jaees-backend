@@ -97,10 +97,21 @@ export const getAllUser = async (req, res) => {
 
 export const updateStateUser = async (req, res) => {
     try {
+
+        let roles;
+        if (req.body.rol) {
+            const rolFound = await RolesModel.find({name: {$in: req.body.rol}});
+            roles = rolFound.map((rol) => rol._id);
+        } else {
+            const rolUser = await RolesModel.findOne({name: "seller"});
+            roles = [rolUser._id];
+        }
+
         const userUpdate = await UserModel.findByIdAndUpdate(req.params.id, {
             state: req.body.state,
             country: req.body.country,
-            permissions: req.body.permissions
+            permissions: req.body.permissions,
+            rol: roles
         });
 
         if (!userUpdate) {
@@ -109,7 +120,7 @@ export const updateStateUser = async (req, res) => {
 
         return responseSuccess(res, 200, "usuario actualizado");
     } catch (error) {
-        return responseError(res, 500, "error");
+        console.log(error)
     }
 };
 

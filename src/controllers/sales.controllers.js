@@ -77,6 +77,34 @@ export const getAllSales = async (req, res) => {
   }
 };
 
+// Función auxiliar para obtener el porcentaje de IVA
+function getIvaPercentage(currency) {
+  switch (currency) {
+    case 'colombia':
+      return 1.19;
+    case 'ecuador':
+      return 1.15;
+    case 'chile':
+      return 1.19;
+    default:
+      return 1.19;
+  }
+}
+
+// Función auxiliar para saber cuanto de iva
+function currencyIva(currency) {
+  switch (currency) {
+    case 'colombia':
+      return `IVA (19%)`;
+    case 'ecuador':
+      return `IVA (15%)`;
+    case 'chile':
+      return `IVA (19%)`;
+    default:
+      return `IVA (19%)`;
+  }
+}
+
 // Función auxiliar para redondear según la moneda
 function roundCurrency(value, currency) {
   switch (currency) {
@@ -112,7 +140,7 @@ export const getSalesById = async (req, res) => {
       return sum + (isNaN(gameValue) ? 0 : gameValue);
     }, 0);
 
-    const subTotal = totalGames / 1.19;
+    const subTotal = totalGames / getIvaPercentage(currency);
     const ivaTotal = totalGames - subTotal;
     const totalPago = totalGames;
 
@@ -120,7 +148,8 @@ export const getSalesById = async (req, res) => {
       ...saleById.toObject(),
       subTotal: roundCurrency(subTotal, currency),
       ivaTotal: roundCurrency(ivaTotal, currency),
-      totalPago: roundCurrency(totalPago, currency)
+      totalPago: roundCurrency(totalPago, currency),
+      ivaText: currencyIva(currency),
     };
 
     responseSuccess(res, 200, "venta", saleWithTotals);
